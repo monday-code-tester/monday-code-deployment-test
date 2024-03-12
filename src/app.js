@@ -29,7 +29,7 @@ app.get('/deep-health', async (req, res) => {
     }
 
     logger.debug(`Deep health finished successfully`);
-    res.status(200).send({ 'status': 'OK' });
+    res.status(200).send({ 'status': 'OK', randomWord });
 
   } catch (error) {
     logger.error(`Deep health failed: ${error}`);
@@ -39,7 +39,12 @@ app.get('/deep-health', async (req, res) => {
 
 app.get('/topic-name', (req, res) => {
   const name = process.env.MNDY_TOPIC_NAME || 'process.env.MNDY_TOPIC_NAME not found';
-  res.status(200).send({ 'status': 'OK', name });
+  res.status(200).send({ 'status': 'OK', name, new_draft_version_deploy: true });
+});
+
+app.get('/env-var', (req, res) => {
+  const envVarValue = process.env.MY_VAR || 'process.env.MY_VAR not found';
+  res.status(200).send({ 'status': 'OK', envVarValue });
 });
 
 app.listen(port, () => console.log(`monday code tester app listening at http://localhost:${port}`));
