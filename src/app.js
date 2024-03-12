@@ -29,7 +29,7 @@ app.get('/deep-health', async (req, res) => {
     }
 
     logger.debug(`Deep health finished successfully`);
-    res.status(200).send({ 'status': 'OK' });
+    res.status(200).send({ 'status': 'OK', randomWord });
 
   } catch (error) {
     logger.error(`Deep health failed: ${error}`);
