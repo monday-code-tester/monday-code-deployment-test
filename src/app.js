@@ -13,23 +13,28 @@ app.get('/deepHealth', async (req, res) => {
   const secure = new SecureStorage();
   const logger = new Logger('test-logger');
 
-  logger.info(`This is a logger info. the random word is: ${randomWord}`);
+  try {
+    logger.info(`This is a logger info. the random word is: ${randomWord}`);
 
-  const key = Date.now() + '';
-  const value = 'test';
+    const key = Date.now() + '';
+    const value = 'test';
 
-  await secure.set(key, value);
-  const result = await secure.get(key);
-  const deleted = await secure.delete(key);
-  const result2 = await secure.get(key);
+    await secure.set(key, value);
+    const result = await secure.get(key);
+    const deleted = await secure.delete(key);
+    const result2 = await secure.get(key);
 
-  if (!(result === value && deleted && !result2)) {
+    if (!(result === value && deleted && !result2)) {
+      throw new Error('Secure storage assertion failed');
+    }
+
+    logger.debug(`Deep health finished successfully`);
+    res.status(200).send({ 'status': 'OK' });
+
+  } catch (error) {
+    logger.error(`Deep health failed: ${error}`);
     res.status(500).send({ 'status': 'FAILED' });
-    return;
   }
-
-  logger.debug(`Deep health finished successfully`);
-  res.status(200).send({ 'status': 'OK' });
 });
 
 
