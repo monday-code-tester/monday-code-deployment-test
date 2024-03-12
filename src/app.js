@@ -8,7 +8,7 @@ app.get('/health', (req, res) => {
   res.status(200).send({ 'status': 'OK' });
 });
 
-app.get('/deepHealth', async (req, res) => {
+app.get('/deep-health', async (req, res) => {
   const { randomWord } = req.query;
   const secure = new SecureStorage();
   const logger = new Logger('test-logger');
@@ -37,6 +37,10 @@ app.get('/deepHealth', async (req, res) => {
   }
 });
 
+app.get('/topic-name', (req, res) => {
+  const name = process.env.MNDY_TOPIC_NAME || 'process.env.MNDY_TOPIC_NAME not found';
+  res.status(200).send({ 'status': 'OK', name });
+});
 
 app.listen(port, () => console.log(`monday code tester app listening at http://localhost:${port}`));
 
