@@ -42,5 +42,10 @@ app.get('/topic-name', (req, res) => {
   res.status(200).send({ 'status': 'OK', name });
 });
 
+app.get('/env-var', (req, res) => {
+  const envVarValue = process.env.MY_VAR || 'process.env.MY_VAR not found';
+  res.status(200).send({ 'status': 'OK', envVarValue });
+});
+
 app.listen(port, () => console.log(`monday code tester app listening at http://localhost:${port}`));
 
