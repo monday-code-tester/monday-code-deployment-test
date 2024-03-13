@@ -39,7 +39,7 @@ app.get('/deep-health', async (req, res) => {
 
 app.get('/topic-name', (req, res) => {
   const name = process.env.MNDY_TOPIC_NAME || 'process.env.MNDY_TOPIC_NAME not found';
-  res.status(200).send({ 'status': 'OK', name, new_draft_version_deploy: true, hello_dor: 'HELLO' });
+  res.status(200).send({ 'status': 'OK', name });
 });
 
 app.get('/env-var', (req, res) => {
