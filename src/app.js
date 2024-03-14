@@ -1,5 +1,7 @@
 import express from 'express';
-import { Logger, SecureStorage } from '@mondaycom/apps-sdk';
+import { Logger, SecureStorage, EnvironmentVariablesManager} from '@mondaycom/apps-sdk';
+
+const secretManager = new EnvironmentVariablesManager({updateProcessEnv: true});
 
 const app = express();
 const port = 8080;
@@ -43,7 +45,7 @@ app.get('/topic-name', (req, res) => {
 });
 
 app.get('/env-var', (req, res) => {
-  const envVarValue = process.env.MY_VAR || 'process.env.MY_VAR not found';
+  const envVarValue = secretManager.get('MY_VAR') || process.env.MY_VAR || 'process.env.MY_VAR not found';
   res.status(200).send({ 'status': 'OK', envVarValue });
 });
 
