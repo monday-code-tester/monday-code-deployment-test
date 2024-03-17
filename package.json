@@ -7,12 +7,12 @@
     "start": "node ./src/app.js"
   },
   "dependencies": {
-    "@mondaycom/apps-sdk": "^3.0.2",
+    "@mondaycom/apps-sdk": "*",
     "body-parser": "^1.19.0",
     "dotenv": "^5.0.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^9.0.2",
-    "monday-sdk-js": "^0.5.2",
+    "monday-sdk-js": "*",
     "querystring": "^0.2.0",
     "ts-node": "^9.1.1"
   },
