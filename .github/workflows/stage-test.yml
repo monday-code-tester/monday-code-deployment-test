@@ -1,4 +1,4 @@
-name: monday code usability tester
+name: monday code staging-test
 
 # Controls when the workflow will run
 on:
