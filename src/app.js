@@ -1,7 +1,7 @@
 import express from 'express';
-import { Logger, SecureStorage, EnvironmentVariablesManager} from '@mondaycom/apps-sdk';
+import { Logger, SecureStorage, EnvironmentVariablesManager, SecretsManager } from '@mondaycom/apps-sdk';
 
-const secretManager = new EnvironmentVariablesManager({updateProcessEnv: true});
+const envs = new EnvironmentVariablesManager({ updateProcessEnv: true });
 const logger = new Logger('test-logger');
 
 const app = express();
@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
   let processEnv = process.env;
   res.status(200).send({
     hard_coded_data: { // FIXME: change for each deployment
-      'region (from env)': process.env.MNDY_REGION || 'null',
+      'region (from env)': processEnv.MNDY_REGION || 'null',
       'last code change (hard coded)': '2024-06-19T10:45:00.000Z'
     },
     secretsObject,
