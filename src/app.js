@@ -78,7 +78,7 @@ app.get('/topic-name', (req, res) => {
 });
 
 app.get('/env-var', (req, res) => {
-  const envVarValue = secretManager.get('MY_VAR') || process.env.MY_VAR || 'process.env.MY_VAR not found';
+  const envVarValue = envs.get('MY_VAR') || process.env.MY_VAR || 'process.env.MY_VAR not found';
   res.status(200).send({ 'status': 'OK', envVarValue });
 });
 
