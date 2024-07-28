@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APPS_DOMAIN: https://monday-apps-ms.mondaystaging.com
-      MCDOE_SUPPRT_MULTIREGION: true
     steps:
     - uses: actions/checkout@v2
     - name: Deploy app to monday-code using the apps CLI
