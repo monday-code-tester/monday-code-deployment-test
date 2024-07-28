@@ -24,8 +24,8 @@ jobs:
       MCDOE_SUPPRT_MULTIREGION: true
     steps:
     - uses: actions/checkout@v2
-    - name: Deploy app to monday-code using the apps CLI (beta)
-      uses: mondaycom/monday-code-deploy-action@beta-cli
+    - name: Deploy app to monday-code using the apps CLI
+      uses: mondaycom/monday-code-deploy-action@master
       with:
         token: ${{ github.event.inputs.token }}
         appId: ${{ github.event.inputs.appId }}
