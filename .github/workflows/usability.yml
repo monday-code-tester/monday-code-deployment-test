@@ -11,6 +11,9 @@ on:
       token:
         description: 'Dev center access token'
         required: true
+      region:
+        description: 'The region to deploy the app to (us, eu, au)'
+        required: false
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -24,3 +27,4 @@ jobs:
       with:
         token: ${{ github.event.inputs.token }}
         appId: ${{ github.event.inputs.appId }}
+        region: ${{ github.event.inputs.region }}
