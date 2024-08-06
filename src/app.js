@@ -1,10 +1,13 @@
 import express from 'express';
+const bodyParser = require('body-parser');
 import { Logger, SecureStorage, EnvironmentVariablesManager, SecretsManager } from '@mondaycom/apps-sdk';
+import mondayController from './controllers/text-transformer.js';
 
 const envs = new EnvironmentVariablesManager({ updateProcessEnv: true });
 const logger = new Logger('test-logger');
 
 const app = express();
+app.use(bodyParser.json());
 const port = 8080;
 
 app.get('/', (req, res) => {
@@ -86,6 +89,9 @@ app.get('/region', (req, res) => {
   const region = process.env.MNDY_REGION || 'MNDY_REGION env var was null or undefined';
   res.status(200).send({ 'status': 'OK', region });
 });
+
+app.post('/monday/execute_action', mondayController.executeAction);
+app.post('/monday/get_remote_list_options', mondayController.getRemoteListOptions);
 
 app.listen(port, () => console.log(`monday code tester app listening at http://localhost:${port}`));
 
