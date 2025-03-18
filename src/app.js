@@ -1,11 +1,25 @@
 import express from 'express';
 import { Logger, SecureStorage, EnvironmentVariablesManager, SecretsManager } from '@mondaycom/apps-sdk';
+import { 
+  queueTestConfig, 
+  processQueueMessage, 
+  runQueueHealthCheck,
+} from './services/queueService.js';
+
+// These are declared in queueService.js and maintained for backward compatibility
+// They are still accessible from there but referenced here for documentation
+// let queueMessageReceived = false;
+// let lastReceivedQueueMessage = null;
+// let queueMessageTimestamp = null;
 
 const envs = new EnvironmentVariablesManager({ updateProcessEnv: true });
 const logger = new Logger('test-logger');
 
 const app = express();
 const port = 8080;
+
+// Parse JSON bodies
+app.use(express.json());
 
 app.get('/', (req, res) => {
   logger.info(`hello from info`);
@@ -45,12 +59,24 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/deep-health', async (req, res) => {
-  const { randomWord } = req.query;
+  const { randomWord, timeoutMs, checkIntervalMs } = req.query;
   const secure = new SecureStorage();
+  
+  // Allow configuration via query parameters
+  const timeout = timeoutMs ? parseInt(timeoutMs, 10) : queueTestConfig.timeoutMs;
+  const interval = checkIntervalMs ? parseInt(checkIntervalMs, 10) : queueTestConfig.checkIntervalMs;
+  
+  const startTime = Date.now();
+  const diagnostics = {
+    start: new Date(startTime).toISOString(),
+    steps: []
+  };
 
   try {
-    logger.info(`This is a logger info. the random word is: ${randomWord}`);
+    logger.info(`Deep health check started - randomWord: ${randomWord}`);
+    diagnostics.steps.push({ step: 'start', time: diagnostics.start });
 
+    // Secure storage test
     const key = Date.now() + '';
     const value = 'test';
 
@@ -62,14 +88,69 @@ app.get('/deep-health', async (req, res) => {
     if (!(result === value && deleted && !result2)) {
       throw new Error('Secure storage assertion failed');
     }
+    
+    diagnostics.steps.push({ step: 'secure-storage-complete', timeMs: Date.now() - startTime });
 
-    logger.debug(`Deep health finished successfully`);
-    res.status(200).send({ 'status': 'OK', randomWord });
+    // Run queue health check
+    const queueResults = await runQueueHealthCheck(
+      { timeout, interval },
+      diagnostics,
+      startTime
+    );
+
+    logger.debug(`Deep health check completed in ${Date.now() - startTime}ms`);
+    diagnostics.end = new Date().toISOString();
+    diagnostics.durationMs = Date.now() - startTime;
+    
+    res.status(200).send({ 
+      'status': queueResults.status,
+      randomWord,
+      queueTest: queueResults.queueTest,
+      diagnostics
+    });
 
   } catch (error) {
-    logger.error(`Deep health failed: ${error}`);
-    res.status(500).send({ 'status': 'FAILED' });
+    const errorTime = Date.now();
+    logger.error(`Deep health failed: ${error.message}`, { error });
+    
+    diagnostics.steps.push({ 
+      step: 'error', 
+      timeMs: errorTime - startTime,
+      error: error.message
+    });
+    
+    diagnostics.end = new Date(errorTime).toISOString();
+    diagnostics.durationMs = errorTime - startTime;
+    
+    res.status(500).send({ 
+      'status': 'FAILED', 
+      error: error.message,
+      diagnostics
+    });
   }
+});
+
+// create end point under /queue that receive message from pubsub subscription and print their body
+app.post("/mndy-queue", function (req, res) {
+  console.log("queue message received headers", req.headers);
+  console.log("queue message received body", req.body);
+  console.log("queue message query params", req.query);
+  
+  // Process the queue message using the queue service
+  const result = processQueueMessage(req.body, req.headers);
+  console.log("produce message received", req.body);
+  
+  res.status(200).send();
+});
+
+app.get("/sleep", function (req, res) {
+  console.log("sleep request received");
+  const sleepTime = req.query.sleepTime || 1000;
+  console.log("sleeping for", sleepTime);
+  setTimeout(() => {
+    console.log("sleep done");
+    res.status(200).send();
+  }, sleepTime);
 });
 
 app.get('/topic-name', (req, res) => {
