@@ -98,7 +98,8 @@ app.get('/deep-health', async (req, res) => {
       startTime
     );
 
-    logger.debug(`Deep health check completed in ${Date.now() - startTime}ms`);
+    logger.info(`Deep health check completed in ${Date.now() - startTime}ms`);
+    logger.info(`The random word is: ${randomWord}`);
     diagnostics.end = new Date().toISOString();
     diagnostics.durationMs = Date.now() - startTime;
     
